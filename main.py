@@ -14,6 +14,8 @@ def print_main_menu():
     print("[4] Compare responders vs non-responders (melanoma + tr1 + PBMC)")
     print("[5] Visualize relative frequencies (boxplot)")
     print("[6] Run baseline subset analysis")
+    print("[7] Add a sample")
+    print("[8] Remove sample")
     print("[0] Exit")
 
 def main():
@@ -27,8 +29,12 @@ def main():
             load_data()
         elif choice == "3":
             df = generate_summary_table()
-            print("\nSummary Table (first 10 rows):")
-            print(df.head(10))
+            for sample_id in df['sample'].unique():
+                sample_df = df[df['sample'] == sample_id]
+                print("-" * 40)
+                print(f"Sample: {sample_id}")
+                print(sample_df[['population', 'count', 'percentage']].to_string(index=False))
+            print("-" * 40)
         elif choice == "4":
             df = compare_responders_vs_nonresponders()
             print("\nResponder vs Non-responder Comparison:")
@@ -42,6 +48,55 @@ def main():
             print("\nSample counts per project:", summary['samples_per_project'])
             print("Responders vs Non-responders:", summary['responders_vs_non'])
             print("Sex distribution:", summary['sex_distribution'])
+        elif choice == "7":
+            from src.data_loader import add_sample
+
+            print("\nAdd a Sample Manually")
+
+            meta_fields = {
+                'sample_id': str,
+                'project': str,
+                'subject': str,
+                'condition': str,
+                'age': int,
+                'sex': str,
+                'treatment': str,
+                'response': str,
+                'sample_type': str,
+                'time_from_treatment': int,
+            }
+
+            sample_metadata = {}
+            for field, cast in meta_fields.items():
+                raw = input(f"{field}: ").strip()
+                if raw == '':
+                    sample_metadata[field] = None
+                else:
+                    try:
+                        sample_metadata[field] = cast(raw)
+                    except ValueError:
+                        print(f"Invalid input for '{field}'. Must be of type {cast.__name__}.")
+                        return
+
+            print("\nEnter immune cell counts:")
+            count_fields = ['b_cell', 'cd8_t_cell', 'cd4_t_cell', 'nk_cell', 'monocyte']
+            cell_counts = {}
+            for field in count_fields:
+                raw = input(f"{field}: ").strip()
+                try:
+                    cell_counts[field] = int(raw)
+                except ValueError:
+                    print(f"Invalid count for '{field}'. Must be an integer.")
+                    return
+
+            try:
+                add_sample(sample_metadata, cell_counts)
+            except Exception as e:
+                print(f"Error adding sample: {e}")
+        elif choice == "8":
+            from src.data_loader import remove_sample
+            sample_id = input("Enter sample: ")
+            remove_sample(sample_id)
         elif choice == "0":
             print("Exiting.")
             sys.exit()

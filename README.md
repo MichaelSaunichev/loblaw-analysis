@@ -25,7 +25,7 @@ Tested with: **Python 3.12.5**
 ### 1. Clone the Repository
 
 ```bash
-git clone TODO add url
+git clone https://github.com/MichaelSaunichev/loblaw-analysis
 cd loblaw-analysis
 ```
 
@@ -34,7 +34,7 @@ cd loblaw-analysis
 ### 2. Set Up a Virtual Environment
 
 ```bash
-python3.12 -m venv venv      # Please use 3.12 for now as this has not been tested with other versions
+python3.12 -m venv venv      # Please use 3.12 for now since compatibility with other versions has not been verified
 source venv/bin/activate     # For Mac/Linux
 venv\Scripts\activate        # For Windows
 ```
